@@ -12,6 +12,10 @@
 
 ```source venv/bin/activate```
 
+Установка необходимых зависимостей:
+
+```pip install -r requirements.txt```
+
 Для запуска сбора данных:
 
 ```cd movie_parser```
