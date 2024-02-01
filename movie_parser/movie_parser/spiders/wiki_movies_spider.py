@@ -19,6 +19,14 @@ class WikiMoviesSpider(scrapy.Spider):
             url = response.urljoin(href.extract())
             yield scrapy.Request(url, callback=self.parse_movie_page)
 
+        yield from self.parse_next_page(response)
+
+    def parse_next_page(self, response):
+        next_page_html = response.xpath("//*[@id='mw-pages']/a[contains(text(), 'Следующая страница')]/@href").get()
+        if next_page_html:
+            next_page_url = response.urljoin(next_page_html)
+            yield scrapy.Request(next_page_url, callback=self.parse)
+
     def parse_movie_page(self, response):
         item = MovieParserItem()
         td_title_html = response.xpath("//th[@class='infobox-above']").get()
@@ -76,10 +84,12 @@ class WikiMoviesSpider(scrapy.Spider):
             td_years = self.remove_elements(td_years_html)
             item['year'] = ' '.join(td_years.xpath("//text()")).strip()
 
-        imdb_href = response.xpath("//th[contains(a, 'IMDb')]/following-sibling::td//a/@href").get()
-        if imdb_href:
-            imdb_url = response.urljoin(imdb_href)
-            headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Safari/605.1.15'}
+        imdb_html = response.xpath("//th[contains(a, 'IMDb')]/following-sibling::td//a/@href").get()
+        if imdb_html:
+            imdb_url = response.urljoin(imdb_html)
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Safari/605.1.15'
+            }
             request = scrapy.Request(imdb_url, headers=headers, callback=self.parse_imdb)
             request.meta['item'] = item
             yield request

@@ -17,7 +17,7 @@ NEWSPIDER_MODULE = "movie_parser.spiders"
 #USER_AGENT = "movie_parser (+http://www.yourdomain.com)"
 
 # Obey robots.txt rules
-ROBOTSTXT_OBEY = True
+ROBOTSTXT_OBEY = False
 
 # Desired file format
 FEEDS = {
